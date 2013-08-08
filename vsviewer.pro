@@ -5,5 +5,5 @@ SOURCES = vsviewer.cpp \
 
 LIBS += -lvapoursynth-script
 
-QMAKE_CC = clang
-QMAKE_CXX = clang++
+;QMAKE_CC = clang
+;QMAKE_CXX = clang++
