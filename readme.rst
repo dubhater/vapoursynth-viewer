@@ -26,4 +26,4 @@ VapourSynth revision https://github.com/vapoursynth/vapoursynth/commit/314012b91
 Notes
 =====
 
-Something leaks. Maybe I don't free something that should be freed, or maybe the problem is in VapourSynth. Either way, loading a new script adds about 12 megabytes to the program's memory use.
+Something leaks, maybe 1 megabyte every time a script is (re)loaded.
