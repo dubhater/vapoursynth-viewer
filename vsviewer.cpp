@@ -213,6 +213,7 @@ int VSViewer::script_open(QString script_name) {
    VSPlugin *resizePlugin = vsapi->getPluginNs("resize", core);
    VSMap *resizeArgs = vsapi->createMap();
    vsapi->propSetNode(resizeArgs, "clip", node, paReplace);
+   vsapi->freeNode(node);
    vsapi->propSetInt(resizeArgs, "format", /*pfRGB24*/ pfCompatBGR32, paReplace);
 
    VSMap *resizeRet = vsapi->invoke(resizePlugin, "Bicubic", resizeArgs);
