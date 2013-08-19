@@ -197,6 +197,7 @@ int VSViewer::script_open(QString script_name) {
       fail += QString::fromUtf8(vsscript_getError(se));
       imglabel->setText(fail);
       vsscript_freeScript(se);
+      se = NULL;
       return 0;
    }
 
@@ -205,6 +206,7 @@ int VSViewer::script_open(QString script_name) {
       fail = "Failed to retrieve output node. Invalid index specified?";
       imglabel->setText(fail);
       vsscript_freeScript(se);
+      se = NULL;
       return 0;
    }
 
@@ -241,6 +243,7 @@ int VSViewer::script_open(QString script_name) {
 done:
    imglabel->setText(fail);
    vsscript_freeScript(se);
+   se = NULL;
    return 0;
 }
 
