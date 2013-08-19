@@ -147,7 +147,7 @@ void VSViewer::openFile(QString name) {
 
    int ret = script_open(name);
    fileClose->setEnabled(ret);
-   fileReload->setEnabled(ret);
+   fileReload->setEnabled(true);
    fileGotoFrame->setEnabled(ret);
    if (!ret) {
       // TODO: error message
