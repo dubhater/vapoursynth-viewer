@@ -1,9 +1,8 @@
-HEADERS = vsviewer.h
+HEADERS = vsviewer.h \
+          preview.h
 
 SOURCES = vsviewer.cpp \
+          preview.cpp \
           main.cpp
 
 LIBS += -lvapoursynth-script
-
-;QMAKE_CC = clang
-;QMAKE_CXX = clang++

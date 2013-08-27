@@ -6,48 +6,34 @@
 
 #include <vapoursynth/VSScript.h>
 
+#include "preview.h"
+
 class VSViewer : public QMainWindow {
    Q_OBJECT
 
    public slots:
       void onFileOpen();
-      void onFileClose();
       void onFileReload();
-      void onGotoFrame();
+      void onFilePreview();
 
    public:
       VSViewer();
-      ~VSViewer();
 
    private:
       QAction *fileOpen;
-      QAction *fileClose;
       QAction *fileReload;
-      QAction *fileGotoFrame;
-      QLabel *imglabel;
-      QLabel *frameLabel;
+      QAction *filePreview;
 
-      int init;
-      const VSAPI *vsapi;
-      VSScript *se;
-      VSNodeRef *node;
+      QPlainTextEdit *textEdit;
+      Preview *preview;
 
-      const VSFrameRef *currentFrameRef;
-      int currentFrameNum;
-      int lastFrameVisited;
 
       QString scriptName;
 
       void ui_init();
-      void vs_init();
 
       void openFile(QString name);
-      int script_open(QString script_name);
-      int script_close();
-
-      void seek(int n);
-
-      void keyPressEvent(QKeyEvent * event);
+      void set_title(QString script_name, bool modified);
 };
 
 #endif
