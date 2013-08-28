@@ -1,9 +1,7 @@
 
 // TODO:
-//    - popups for error messages
 //    - scrollbars
 //    - user-selected output index
-//    - script_open should not touch the GUI
 
 
 #include <QtCore>
@@ -96,10 +94,9 @@ Preview::~Preview() {
 void Preview::openFile(QString script, QString script_name) {
    closeFile();
 
-   int ret = script_open(script, script_name);
-   if (!ret) {
-      // TODO: error message
-      qDebug("script_open failed\n");
+   QString ret = script_open(script, script_name);
+   if (!ret.isNull()) {
+      errmsg(ret);
       return;
    }
 
@@ -125,7 +122,7 @@ void Preview::closeFile() {
 }
 
 
-int Preview::script_open(QString script, QString script_name) {
+QString Preview::script_open(QString script, QString script_name) {
    QString fail;
 
    int ret = vsscript_evaluateScript(&se, script.toUtf8().constData(), script_name.toUtf8().constData(), efSetWorkingDir);
@@ -133,19 +130,17 @@ int Preview::script_open(QString script, QString script_name) {
    if (ret) {
       fail = "Script evaluation failed:\n";
       fail += QString::fromUtf8(vsscript_getError(se));
-      imglabel->setText(fail);
       vsscript_freeScript(se);
       se = NULL;
-      return 0;
+      return fail;
    }
 
    node = vsscript_getOutput(se, 0);
    if (!node) {
       fail = "Failed to retrieve output node. Invalid index specified?";
-      imglabel->setText(fail);
       vsscript_freeScript(se);
       se = NULL;
-      return 0;
+      return fail;
    }
 
    // Convert to RGB, swscale willing.
@@ -179,13 +174,12 @@ int Preview::script_open(QString script, QString script_name) {
 
    vi = vsapi->getVideoInfo(node);
 
-   return 1;
+   return fail;
 
 done:
-   imglabel->setText(fail);
    vsscript_freeScript(se);
    se = NULL;
-   return 0;
+   return fail;
 }
 
 
@@ -229,9 +223,7 @@ void Preview::seek(int n) {
    char err[100];
    const VSFrameRef *frame = vsapi->getFrame(n, node, err, sizeof(err));
    if (!frame) {
-      // FIXME: Shit failed. We should display err somewhere.
-      // Not in imglabel, because this is not a fatal error.
-      qDebug("Failed to retrieve frame %d:\n%s\n", n, err);
+      errmsg(QString("Failed to retrieve frame %1:\n%2").arg(n).arg(QString::fromUtf8(err)));
       return;
    }
 
@@ -303,4 +295,11 @@ void Preview::gotoFrame() {
    if (okay) {
       seek(n);
    }
+}
+
+
+void Preview::errmsg(QString msg) {
+   QMessageBox box(this);
+   box.setText(msg);
+   box.exec();
 }

@@ -36,7 +36,7 @@ class Preview : public QDialog {
 
       void closeFile();
 
-      int script_open(QString script, QString script_name);
+      QString script_open(QString script, QString script_name);
       int script_close();
 
       void seek(int n);
@@ -44,6 +44,8 @@ class Preview : public QDialog {
       void keyPressEvent(QKeyEvent * event);
 
       void gotoFrame();
+
+      void errmsg(QString msg);
 };
 
 #endif
