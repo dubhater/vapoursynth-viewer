@@ -1,13 +1,13 @@
 Description
 ===========
 
-VSViewer is a simple program for previewing VapourSynth scripts.
+VSViewer is a simple program for editing and previewing VapourSynth scripts.
 
 
 Usage
 =====
 
-Open a VapourSynth script and move around in it using left, right, page down, page up, home, end.
+Hit F5 to preview. Move around in the preview window using left, right, page down, page up, home, end. Press g to go to a specific frame.
 
 
 Compilation
