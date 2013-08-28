@@ -1,9 +1,7 @@
 // TODO:
-//    - modified flag
 //    - line numbers
 //    - highlight current line
 //    - syntax highlighting
-//    - confirm closing a script and quitting
 
 
 #include <QtCore>
@@ -72,9 +70,12 @@ void VSViewer::ui_init() {
    textEdit->setFont(QFont("monospace", 9));
    textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 
+   connect(textEdit->document(), SIGNAL(modificationChanged(bool)),
+                           this, SLOT(set_title(bool)));
+
    setCentralWidget(textEdit);
 
-   set_title(scriptName, false);
+   set_title(false);
 
    resize(800, 600);
 }
@@ -90,16 +91,27 @@ VSViewer::VSViewer()
 
 
 void VSViewer::onFileNew() {
-   scriptName = "Untitled";
-
-   // reset modified flag
-
-   // confirm discarding changes
+   if (textEdit->document()->isModified()) {
+      int ret = confirmDiscard();
+      switch (ret) {
+         case QMessageBox::Save:
+            onFileSave();
+            break;
+         case QMessageBox::Discard:
+            break;
+         case QMessageBox::Cancel:
+            return;
+            break;
+      }
+   }
 
    scriptName = "Untitled";
    scriptExists = false;
 
    textEdit->setPlainText("");
+   textEdit->document()->setModified(false);
+
+   set_title(false);
 
    fileReload->setEnabled(false);
 }
@@ -112,14 +124,25 @@ void VSViewer::onFileOpen() {
       return;
    }
 
+   if (textEdit->document()->isModified()) {
+      int ret = confirmDiscard();
+      switch (ret) {
+         case QMessageBox::Save:
+            onFileSave();
+            break;
+         case QMessageBox::Discard:
+            break;
+         case QMessageBox::Cancel:
+            return;
+            break;
+      }
+   }
+
    openFile(name);
 }
 
 
 void VSViewer::openFile(QString name) {
-   // confirm discarding the changes
-   //
-
    QFile file(name);
    bool ret = file.open(QIODevice::ReadOnly);
    if (!ret) {
@@ -138,12 +161,14 @@ void VSViewer::openFile(QString name) {
    textEdit->setPlainText(stream.readAll());
    file.close();
 
-   fileReload->setEnabled(true);
+   textEdit->document()->setModified(false);
 
-   set_title(name, false);
+   fileReload->setEnabled(true);
 
    scriptName = name;
    scriptExists = true;
+
+   set_title(false);
 }
 
 
@@ -151,7 +176,7 @@ void VSViewer::onFileSave() {
    if (scriptExists) {
       saveFile(scriptName);
 
-      set_title(scriptName, false);
+      set_title(false);
    } else {
       onFileSaveAs();
    }
@@ -172,7 +197,7 @@ void VSViewer::onFileSaveAs() {
 
    fileReload->setEnabled(true);
 
-   set_title(name, false);
+   set_title(false);
 }
 
 
@@ -188,11 +213,25 @@ void VSViewer::saveFile(QString name) {
    stream.setCodec("UTF-8");
    stream << textEdit->toPlainText();
    file.close();
+
+   textEdit->document()->setModified(false);
 }
 
 
 void VSViewer::onFileReload() {
    if (scriptExists) {
+      if (textEdit->document()->isModified()) {
+         QMessageBox box(this);
+         box.setText("Discard changes?");
+         box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+         box.setDefaultButton(QMessageBox::Yes);
+         int ret = box.exec();
+
+         if (ret == QMessageBox::No) {
+            return;
+         }
+      }
+
       openFile(scriptName);
    }
 }
@@ -211,12 +250,12 @@ void VSViewer::onFilePreview() {
 }
 
 
-void VSViewer::set_title(QString script_name, bool modified) {
+void VSViewer::set_title(bool modified) {
    QString title = "vsviewer - ";
    if (modified) {
       title += "*";
    }
-   title += QFileInfo(script_name).fileName();
+   title += QFileInfo(scriptName).fileName();
 
    setWindowTitle(title);
 }
@@ -226,4 +265,33 @@ void VSViewer::errmsg(QString msg) {
    QMessageBox box(this);
    box.setText(msg);
    box.exec();
+}
+
+
+int VSViewer::confirmDiscard() {
+   QMessageBox box(this);
+   box.setText("The script has been modified.");
+   box.setInformativeText("Do you want to save your changes?");
+   box.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+   box.setDefaultButton(QMessageBox::Save);
+   return box.exec();
+}
+
+
+void VSViewer::closeEvent(QCloseEvent *event) {
+   if (textEdit->document()->isModified()) {
+      int ret = confirmDiscard();
+      switch (ret) {
+         case QMessageBox::Save:
+            onFileSave();
+            event->accept();
+            break;
+         case QMessageBox::Discard:
+            event->accept();
+            break;
+         case QMessageBox::Cancel:
+            event->ignore();
+            break;
+      }
+   }
 }

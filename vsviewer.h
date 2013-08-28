@@ -20,6 +20,8 @@ class VSViewer : public QMainWindow {
       void onFileReload();
       void onFilePreview();
 
+      void set_title(bool modified);
+
    public:
       VSViewer();
 
@@ -38,14 +40,17 @@ class VSViewer : public QMainWindow {
       QString scriptName;
       bool scriptExists;
 
+
       void ui_init();
 
       void openFile(QString name);
       void saveFile(QString name);
 
-      void set_title(QString script_name, bool modified);
-
       void errmsg(QString msg);
+
+      int confirmDiscard();
+
+      void closeEvent(QCloseEvent *event);
 };
 
 #endif
