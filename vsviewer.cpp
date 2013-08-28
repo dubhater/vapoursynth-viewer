@@ -1,5 +1,4 @@
 // TODO:
-//    - save and save as
 //    - modified flag
 //    - line numbers
 //    - highlight current line
@@ -19,8 +18,16 @@
 
 void VSViewer::ui_init() {
    // Set up the menus.
+   fileNew = new QAction("&New script", this);
+   fileNew->setShortcut(QKeySequence("Ctrl+N"));
+
    fileOpen = new QAction("&Open script...", this);
    fileOpen->setShortcut(QKeySequence("Ctrl+O"));
+
+   fileSave = new QAction("&Save script", this);
+   fileSave->setShortcut(QKeySequence("Ctrl+S"));
+
+   fileSaveAs = new QAction("Save script &as...", this);
 
    fileReload = new QAction("&Reload script", this);
    fileReload->setShortcut(QKeySequence("Ctrl+R"));
@@ -32,8 +39,15 @@ void VSViewer::ui_init() {
    QAction *fileQuit = new QAction("&Quit", this);
    fileQuit->setShortcut(QKeySequence("Ctrl+Q"));
 
+
+   connect(fileNew, SIGNAL(triggered()),
+              this, SLOT(onFileNew()));
    connect(fileOpen, SIGNAL(triggered()),
                this, SLOT(onFileOpen()));
+   connect(fileSave, SIGNAL(triggered()),
+               this, SLOT(onFileSave()));
+   connect(fileSaveAs, SIGNAL(triggered()),
+                 this, SLOT(onFileSaveAs()));
    connect(fileReload, SIGNAL(triggered()),
                  this, SLOT(onFileReload()));
    connect(filePreview, SIGNAL(triggered()),
@@ -43,7 +57,10 @@ void VSViewer::ui_init() {
 
 
    QMenu *fileMenu = menuBar()->addMenu("&File");
+   fileMenu->addAction(fileNew);
    fileMenu->addAction(fileOpen);
+   fileMenu->addAction(fileSave);
+   fileMenu->addAction(fileSaveAs);
    fileMenu->addAction(fileReload);
    fileMenu->addSeparator();
    fileMenu->addAction(filePreview);
@@ -65,9 +82,26 @@ void VSViewer::ui_init() {
 
 VSViewer::VSViewer()
  : preview(NULL),
-   scriptName("Untitled")
+   scriptName("Untitled"),
+   scriptExists(false)
 {
    ui_init();
+}
+
+
+void VSViewer::onFileNew() {
+   scriptName = "Untitled";
+
+   // reset modified flag
+
+   // confirm discarding changes
+
+   scriptName = "Untitled";
+   scriptExists = false;
+
+   textEdit->setPlainText("");
+
+   fileReload->setEnabled(false);
 }
 
 
@@ -101,20 +135,64 @@ void VSViewer::openFile(QString name) {
 
    QTextStream stream(&file);
    stream.setCodec("UTF-8");
-   QString script = stream.readAll();
+   textEdit->setPlainText(stream.readAll());
    file.close();
-   textEdit->setPlainText(script);
 
    fileReload->setEnabled(true);
 
    set_title(name, false);
 
    scriptName = name;
+   scriptExists = true;
+}
+
+
+void VSViewer::onFileSave() {
+   if (scriptExists) {
+      saveFile(scriptName);
+
+      set_title(scriptName, false);
+   } else {
+      onFileSaveAs();
+   }
+}
+
+
+void VSViewer::onFileSaveAs() {
+   QString name = QFileDialog::getSaveFileName(this, "Save VapourSynth script", QString(), QString(), 0, QFileDialog::DontUseNativeDialog);
+
+   if (name.isNull()) {
+      return;
+   }
+
+   saveFile(name);
+
+   scriptName = name;
+   scriptExists = true;
+
+   fileReload->setEnabled(true);
+
+   set_title(name, false);
+}
+
+
+void VSViewer::saveFile(QString name) {
+   QFile file(name);
+   bool ret = file.open(QIODevice::WriteOnly);
+   if (!ret) {
+      errmsg(file.errorString());
+      return;
+   }
+
+   QTextStream stream(&file);
+   stream.setCodec("UTF-8");
+   stream << textEdit->toPlainText();
+   file.close();
 }
 
 
 void VSViewer::onFileReload() {
-   if (!scriptName.isNull()) {
+   if (scriptExists) {
       openFile(scriptName);
    }
 }
