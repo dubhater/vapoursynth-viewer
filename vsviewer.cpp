@@ -4,7 +4,6 @@
 //    - line numbers
 //    - highlight current line
 //    - syntax highlighting
-//    - popups for error messages
 //    - confirm closing a script and quitting
 
 
@@ -86,28 +85,31 @@ void VSViewer::onFileOpen() {
 void VSViewer::openFile(QString name) {
    // confirm discarding the changes
    //
-   scriptName = name;
 
    QFile file(name);
    bool ret = file.open(QIODevice::ReadOnly);
    if (!ret) {
-      // TODO: display file.errorString() somewhere
+      errmsg(file.errorString());
       return;
    }
 
    if (file.size() > 16*1024*1024) {
-      // file is over 16 MiB. Refuse to open.
+      errmsg("Script size is over 16 MiB. That is insane.");
+      file.close();
       return;
    }
 
    QTextStream stream(&file);
    stream.setCodec("UTF-8");
    QString script = stream.readAll();
+   file.close();
    textEdit->setPlainText(script);
 
    fileReload->setEnabled(true);
 
-   set_title(scriptName, false);
+   set_title(name, false);
+
+   scriptName = name;
 }
 
 
@@ -139,4 +141,11 @@ void VSViewer::set_title(QString script_name, bool modified) {
    title += QFileInfo(script_name).fileName();
 
    setWindowTitle(title);
+}
+
+
+void VSViewer::errmsg(QString msg) {
+   QMessageBox box(this);
+   box.setText(msg);
+   box.exec();
 }

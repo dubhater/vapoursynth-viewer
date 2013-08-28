@@ -35,6 +35,8 @@ class VSViewer : public QMainWindow {
 
       void openFile(QString name);
       void set_title(QString script_name, bool modified);
+
+      void errmsg(QString msg);
 };
 
 #endif
