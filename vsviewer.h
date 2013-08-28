@@ -7,6 +7,7 @@
 #include <vapoursynth/VSScript.h>
 
 #include "preview.h"
+#include "textedit.h"
 
 class VSViewer : public QMainWindow {
    Q_OBJECT
@@ -24,7 +25,7 @@ class VSViewer : public QMainWindow {
       QAction *fileReload;
       QAction *filePreview;
 
-      QPlainTextEdit *textEdit;
+      TextEdit *textEdit;
       Preview *preview;
 
 

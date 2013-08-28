@@ -1,7 +1,6 @@
 // TODO:
 //    - save and save as
 //    - modified flag
-//    - spaces instead of tabs
 //    - line numbers
 //    - highlight current line
 //    - syntax highlighting
@@ -16,6 +15,7 @@
 
 #include "vsviewer.h"
 #include "preview.h"
+#include "textedit.h"
 
 
 void VSViewer::ui_init() {
@@ -52,7 +52,7 @@ void VSViewer::ui_init() {
    fileMenu->addAction(fileQuit);
 
 
-   textEdit = new QPlainTextEdit();
+   textEdit = new TextEdit();
    textEdit->setFont(QFont("monospace", 9));
    textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
 

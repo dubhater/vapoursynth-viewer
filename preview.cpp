@@ -266,8 +266,7 @@ void Preview::keyPressEvent(QKeyEvent * event)
       return;
    }
 
-   switch (key)
-   {
+   switch (key) {
       case Qt::Key_Left:
          seek(currentFrameNum - 1);
          break;
