@@ -2,6 +2,8 @@
 //    - line numbers
 //    - highlight current line
 //    - syntax highlighting
+//    - call tips - QCompleter, probably
+//    - list of recently opened scripts
 
 
 #include <QtCore>

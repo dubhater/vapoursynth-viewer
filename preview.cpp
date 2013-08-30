@@ -1,7 +1,7 @@
 
 // TODO:
-//    - scrollbars
 //    - user-selected output index
+//    - emit refreshWanted signal when F5 is pressed
 
 
 #include <QtCore>
@@ -16,18 +16,20 @@
 
 
 void Preview::ui_init() {
-   imglabel = new QLabel(this);
+   imglabel = new QLabel;
+   imglabel->setAlignment(Qt::AlignCenter);
 
-   QHBoxLayout *hLayout = new QHBoxLayout;
+   QScrollArea *scrollArea = new QScrollArea;
+   scrollArea->setFrameShape(QFrame::NoFrame);
+   scrollArea->setFocusPolicy(Qt::NoFocus);
+   scrollArea->setAlignment(Qt::AlignCenter);
+   scrollArea->setWidgetResizable(true);
+
+   scrollArea->setWidget(imglabel);
+
    QVBoxLayout *vLayout = new QVBoxLayout;
 
-   hLayout->addStretch(1);
-   hLayout->addWidget(imglabel);
-   hLayout->addStretch(1);
-
-   vLayout->addStretch(1);
-   vLayout->addLayout(hLayout);
-   vLayout->addStretch(1);
+   vLayout->addWidget(scrollArea);
 
    frameLabel = new QLabel();
    vLayout->addWidget(frameLabel);
