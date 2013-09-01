@@ -1,7 +1,6 @@
 // TODO:
 //    - line numbers
 //    - highlight current line
-//    - syntax highlighting
 //    - call tips - QCompleter, probably
 
 
@@ -13,6 +12,7 @@
 #include "vsviewer.h"
 #include "preview.h"
 #include "textedit.h"
+#include "pythonhighlighter.h"
 
 
 void VSViewer::ui_init() {
@@ -76,6 +76,8 @@ void VSViewer::ui_init() {
    textEdit = new TextEdit();
    textEdit->setFont(QFont("monospace", 9));
    textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+   highlighter = new PythonHighlighter(textEdit->document());
 
    connect(textEdit->document(), SIGNAL(modificationChanged(bool)),
                            this, SLOT(set_title(bool)));

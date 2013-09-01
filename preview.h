@@ -6,6 +6,7 @@
 
 #include <vapoursynth/VSScript.h>
 
+
 class Preview : public QDialog {
    Q_OBJECT
 

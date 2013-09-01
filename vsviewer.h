@@ -8,6 +8,8 @@
 
 #include "preview.h"
 #include "textedit.h"
+#include "pythonhighlighter.h"
+
 
 class VSViewer : public QMainWindow {
    Q_OBJECT
@@ -37,6 +39,7 @@ class VSViewer : public QMainWindow {
       QMenu *recentMenu;
 
       TextEdit *textEdit;
+      PythonHighlighter *highlighter;
       Preview *preview;
 
 
