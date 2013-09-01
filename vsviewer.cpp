@@ -3,7 +3,6 @@
 //    - highlight current line
 //    - syntax highlighting
 //    - call tips - QCompleter, probably
-//    - list of recently opened scripts
 
 
 #include <QtCore>
@@ -65,7 +64,13 @@ void VSViewer::ui_init() {
    fileMenu->addSeparator();
    fileMenu->addAction(filePreview);
    fileMenu->addSeparator();
+   recentMenu = fileMenu->addMenu("Recentl&y opened scripts");
+   recentMenu->menuAction()->setEnabled(false);
+   fileMenu->addSeparator();
    fileMenu->addAction(fileQuit);
+
+   connect(fileMenu, SIGNAL(triggered(QAction*)),
+               this, SLOT(onFileRecent(QAction*)));
 
 
    textEdit = new TextEdit();
@@ -77,6 +82,8 @@ void VSViewer::ui_init() {
 
    setCentralWidget(textEdit);
 
+   statusBar();
+
    set_title(false);
 
    resize(800, 600);
@@ -86,9 +93,13 @@ void VSViewer::ui_init() {
 VSViewer::VSViewer()
  : preview(NULL),
    scriptName("Untitled"),
-   scriptExists(false)
+   scriptExists(false),
+   recentLimit(10),
+   settings(new QSettings("vsviewer", "vsviewer"))
 {
    ui_init();
+
+   readSettings();
 }
 
 
@@ -120,7 +131,11 @@ void VSViewer::onFileNew() {
 
 
 void VSViewer::onFileOpen() {
-   QString name = QFileDialog::getOpenFileName(this, "Open VapourSynth script", QString(), QString(), 0, QFileDialog::DontUseNativeDialog);
+   QString dir;
+   if (!scriptExists && !recentScripts.isEmpty()) {
+      dir = QFileInfo(recentScripts[0]).absolutePath();
+   }
+   QString name = QFileDialog::getOpenFileName(this, "Open VapourSynth script", dir, QString(), 0, QFileDialog::DontUseNativeDialog);
 
    if (name.isNull()) {
       return;
@@ -139,6 +154,8 @@ void VSViewer::onFileOpen() {
             break;
       }
    }
+
+   addRecentlyOpened(name);
 
    openFile(name);
 }
@@ -186,7 +203,11 @@ void VSViewer::onFileSave() {
 
 
 void VSViewer::onFileSaveAs() {
-   QString name = QFileDialog::getSaveFileName(this, "Save VapourSynth script", QString(), QString(), 0, QFileDialog::DontUseNativeDialog);
+   QString dir;
+   if (!scriptExists && !recentScripts.isEmpty()) {
+      dir = QFileInfo(recentScripts[0]).absolutePath();
+   }
+   QString name = QFileDialog::getSaveFileName(this, "Save VapourSynth script", dir, QString(), 0, QFileDialog::DontUseNativeDialog);
 
    if (name.isNull()) {
       return;
@@ -296,4 +317,79 @@ void VSViewer::closeEvent(QCloseEvent *event) {
             break;
       }
    }
+
+   writeSettings();
+}
+
+
+void VSViewer::addRecentlyOpened(QString name) {
+   while (recentScripts.size() >= recentLimit) {
+      recentScripts.removeLast();
+   }
+
+   recentScripts.prepend(name);
+
+   recentMenu->clear();
+
+   for (int i = 0; i < recentScripts.size(); i++) {
+      QAction *action = new QAction(QString("&%1 ").arg(i) + QFileInfo(recentScripts[i]).fileName(), recentMenu);
+      action->setStatusTip(recentScripts[i]);
+
+      recentMenu->addAction(action);
+   }
+
+   recentMenu->menuAction()->setEnabled(true);
+}
+
+
+void VSViewer::onFileRecent(QAction *action) {
+   int index = recentMenu->actions().indexOf(action);
+
+   if (index == -1) {
+      return;
+   }
+
+   if (textEdit->document()->isModified()) {
+      int ret = confirmDiscard();
+      switch (ret) {
+         case QMessageBox::Save:
+            onFileSave();
+            break;
+         case QMessageBox::Discard:
+            break;
+         case QMessageBox::Cancel:
+            return;
+            break;
+      }
+   }
+
+   QString name = recentScripts.takeAt(index);
+
+   addRecentlyOpened(name);
+
+   openFile(name);
+}
+
+
+void VSViewer::readSettings() {
+   settings->beginGroup("recentscripts");
+
+   for (int i = recentLimit - 1; i >= 0; i--) {
+      if (settings->contains(QString("script%1").arg(i))) {
+         addRecentlyOpened(settings->value(QString("script%1").arg(i)).toString());
+      }
+   }
+
+   settings->endGroup();
+}
+
+
+void VSViewer::writeSettings() {
+   settings->beginGroup("recentscripts");
+
+   for (int i = 0; i < recentScripts.size(); i++) {
+      settings->setValue(QString("script%1").arg(i), recentScripts[i]);
+   }
+
+   settings->endGroup();
 }

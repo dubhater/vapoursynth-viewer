@@ -19,6 +19,7 @@ class VSViewer : public QMainWindow {
       void onFileSaveAs();
       void onFileReload();
       void onFilePreview();
+      void onFileRecent(QAction *action);
 
       void set_title(bool modified);
 
@@ -33,12 +34,19 @@ class VSViewer : public QMainWindow {
       QAction *fileReload;
       QAction *filePreview;
 
+      QMenu *recentMenu;
+
       TextEdit *textEdit;
       Preview *preview;
 
 
       QString scriptName;
       bool scriptExists;
+
+      QList<QString> recentScripts;
+      int recentLimit;
+
+      QSettings *settings;
 
 
       void ui_init();
@@ -51,6 +59,11 @@ class VSViewer : public QMainWindow {
       int confirmDiscard();
 
       void closeEvent(QCloseEvent *event);
+
+      void addRecentlyOpened(QString name);
+
+      void readSettings();
+      void writeSettings();
 };
 
 #endif
