@@ -64,10 +64,10 @@ PythonHighlighter::PythonHighlighter(QTextDocument *parent)
    highlightingRules.append(rule);
 
    quotationFormat.setForeground(Qt::darkMagenta);
-   rule.pattern = QRegExp("\".*\"");
+   rule.pattern = QRegExp("\"[^\"]*\"");
    rule.format = quotationFormat;
    highlightingRules.append(rule);
-   rule.pattern = QRegExp("'.*'");
+   rule.pattern = QRegExp("'[^']*'");
    highlightingRules.append(rule);
 
    commentFormat.setForeground(Qt::darkGray);

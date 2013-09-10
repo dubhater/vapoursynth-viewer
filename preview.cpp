@@ -2,6 +2,7 @@
 // TODO:
 //    - user-selected output index
 //    - emit refreshWanted signal when F5 is pressed
+//    - install a message handler that uses a message box to display vapoursynth's qFatal messages
 
 
 #include <QtCore>
