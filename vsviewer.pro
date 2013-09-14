@@ -9,4 +9,7 @@ SOURCES = vsviewer.cpp \
           pythonhighlighter.cpp \
           main.cpp
 
-LIBS += -lvapoursynth-script
+unix {
+   CONFIG += link_pkgconfig
+   PKGCONFIG += vapoursynth-script
+}

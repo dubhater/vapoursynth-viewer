@@ -11,7 +11,7 @@
 //#include <QtGlobal>
 
 
-#include <vapoursynth/VSScript.h>
+#include <VSScript.h>
 
 #include "preview.h"
 

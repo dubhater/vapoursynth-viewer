@@ -4,8 +4,6 @@
 #include <QtCore>
 #include <QtGui>
 
-#include <vapoursynth/VSScript.h>
-
 #include "preview.h"
 #include "textedit.h"
 #include "pythonhighlighter.h"

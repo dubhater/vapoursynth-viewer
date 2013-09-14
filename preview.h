@@ -4,7 +4,7 @@
 #include <QtCore>
 #include <QtGui>
 
-#include <vapoursynth/VSScript.h>
+#include <VSScript.h>
 
 
 class Preview : public QDialog {

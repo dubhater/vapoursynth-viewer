@@ -2,6 +2,9 @@
 //    - line numbers
 //    - highlight current line
 //    - call tips - QCompleter, probably
+//    - "insert file path" menu item, for source filters and such
+//    - "New script" should put a minimal vapoursynth script in the editor,
+//       so I don't have to type the boilerplate stuff every time.
 
 
 #include <QtCore>
