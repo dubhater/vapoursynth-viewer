@@ -3,6 +3,8 @@ Description
 
 VSViewer is a simple program for editing and previewing VapourSynth scripts.
 
+Screenshot: http://i.imgur.com/l7eyPZj.png
+
 
 Usage
 =====
