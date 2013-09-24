@@ -58,7 +58,7 @@ void Preview::messageHandler(int msgType, const char *msg) const {
       case mtDebug:
          message = "Debug";
          break;
-      case mtWarnin:
+      case mtWarning:
          message = "Warning";
          break;
       case mtCritical:
@@ -118,8 +118,6 @@ Preview::Preview(QWidget *parent)
    lastFrameVisited(-1)
 {
    setAttribute(Qt::WA_DeleteOnClose, false);
-
-   evilGlobalVariable = this;
 
    ui_init();
 
