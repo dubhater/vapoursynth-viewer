@@ -45,6 +45,43 @@ void Preview::ui_init() {
 }
 
 
+const Preview *evilGlobalVariable;
+void VS_CC messageHandler(int msgType, const char *msg) {
+   evilGlobalVariable->messageHandler(msgType, msg);
+}
+
+
+void Preview::messageHandler(int msgType, const char *msg) const {
+   QString message;
+
+   switch (msgType) {
+      case mtDebug:
+         message = "Debug";
+         break;
+      case mtWarnin:
+         message = "Warning";
+         break;
+      case mtCritical:
+         message = "Critical";
+         break;
+      case mtFatal:
+         message = "Fatal";
+         break;
+   }
+
+   message += " message from VapourSynth:\n";
+   message += msg;
+
+   if (msgType == mtFatal) {
+      message += "\n\nGoodbye.";
+   }
+
+   QMessageBox box;
+   box.setText(message);
+   box.exec();
+}
+
+
 void Preview::vs_init() {
    QString fail;
    
@@ -60,6 +97,8 @@ void Preview::vs_init() {
       vsscript_finalize();
       goto done;
    }
+
+   vsapi->setMessageHandler(::messageHandler);
 
    return;
 
@@ -79,6 +118,8 @@ Preview::Preview(QWidget *parent)
    lastFrameVisited(-1)
 {
    setAttribute(Qt::WA_DeleteOnClose, false);
+
+   evilGlobalVariable = this;
 
    ui_init();
 

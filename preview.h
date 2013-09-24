@@ -18,6 +18,8 @@ class Preview : public QDialog {
 
       void openFile(QString script, QString script_name);
 
+      void messageHandler(int msgType, const char *msg) const;
+
    private:
       QLabel *imglabel;
       QLabel *frameLabel;
