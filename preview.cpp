@@ -45,9 +45,9 @@ void Preview::ui_init() {
 }
 
 
-const Preview *evilGlobalVariable;
-void VS_CC messageHandler(int msgType, const char *msg) {
-   evilGlobalVariable->messageHandler(msgType, msg);
+void VS_CC messageHandler(int msgType, const char *msg, void *userData) {
+   Preview *previewWindow = (Preview *)userData;
+   previewWindow->messageHandler(msgType, msg);
 }
 
 
@@ -98,7 +98,7 @@ void Preview::vs_init() {
       goto done;
    }
 
-   vsapi->setMessageHandler(::messageHandler);
+   vsapi->setMessageHandler(::messageHandler, (void *)this);
 
    return;
 
