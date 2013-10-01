@@ -1,13 +1,13 @@
-HEADERS = vsviewer.h \
-          preview.h \
-          textedit.h \
-          pythonhighlighter.h
+HEADERS = src/vsviewer.h \
+          src/preview.h \
+          src/textedit.h \
+          src/pythonhighlighter.h
 
-SOURCES = vsviewer.cpp \
-          preview.cpp \
-          textedit.cpp \
-          pythonhighlighter.cpp \
-          main.cpp
+SOURCES = src/vsviewer.cpp \
+          src/preview.cpp \
+          src/textedit.cpp \
+          src/pythonhighlighter.cpp \
+          src/main.cpp
 
 unix {
    CONFIG += link_pkgconfig
