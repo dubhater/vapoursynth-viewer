@@ -98,7 +98,7 @@ void Preview::vs_init() {
       goto done;
    }
 
-   vsapi->setMessageHandler(::messageHandler, (void *)this);
+   //vsapi->setMessageHandler(::messageHandler, (void *)this);
 
    return;
 
