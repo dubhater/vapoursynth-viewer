@@ -22,7 +22,7 @@ In Linux::
 
 Make sure qmake is from Qt4.
 
-VapourSynth revision https://github.com/vapoursynth/vapoursynth/commit/314012b91982fa4342b9d4912c34aa950e47bd0c or newer needed.
+VapourSynth revision R20 or newer needed.
 
 
 Notes
