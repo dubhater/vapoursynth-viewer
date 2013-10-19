@@ -187,7 +187,7 @@ QString Preview::script_open(QString script, QString script_name) {
 
    // Convert to RGB, swscale willing.
    VSCore *core = vsscript_getCore(se);
-   VSPlugin *resizePlugin = vsapi->getPluginNs("resize", core);
+   VSPlugin *resizePlugin = vsapi->getPluginByNs("resize", core);
    VSMap *resizeArgs = vsapi->createMap();
    vsapi->propSetNode(resizeArgs, "clip", node, paReplace);
    vsapi->freeNode(node);
