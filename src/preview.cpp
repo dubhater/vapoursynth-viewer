@@ -201,7 +201,9 @@ QString Preview::script_open(QString script, QString script_name) {
       fail = "Failed to convert the script's output to COMPATBGR32:\n";
       fail += QString::fromUtf8(resizeError);
       vsapi->freeMap(resizeRet);
-      goto done;
+      vsscript_freeScript(se);
+      se = NULL;
+      return fail;
    }
 
    node = vsapi->propGetNode(resizeRet, "clip", 0, NULL);
@@ -209,18 +211,44 @@ QString Preview::script_open(QString script, QString script_name) {
       fail = "Failed to convert the script's output to COMPATBGR32:\n";
       fail += "resize.Bicubic() did not return a valid clip.";
       vsapi->freeMap(resizeRet);
-      goto done;
+      vsscript_freeScript(se);
+      se = NULL;
+      return fail;
    }
 
    vsapi->freeMap(resizeRet);
 
+   VSPlugin *stdPlugin = vsapi->getPluginByNs("std", core);
+   VSMap *flipArgs = vsapi->createMap();
+   vsapi->propSetNode(flipArgs, "clip", node, paReplace);
+   vsapi->freeNode(node);
+
+   VSMap *flipRet = vsapi->invoke(stdPlugin, "FlipVertical", flipArgs);
+   vsapi->freeMap(flipArgs);
+
+   const char *flipError = vsapi->getError(flipRet);
+   if (flipError) {
+      fail = "FlipVertical failed. Error given:\n";
+      fail += QString::fromUtf8(flipError);
+      vsapi->freeMap(flipRet);
+      vsscript_freeScript(se);
+      se = NULL;
+      return fail;
+   }
+
+   node = vsapi->propGetNode(flipRet, "clip", 0, NULL);
+   if (!node) {
+      fail = "FlipVertical did not return a valid clip.";
+      vsapi->freeMap(flipRet);
+      vsscript_freeScript(se);
+      se = NULL;
+      return fail;
+   }
+
+   vsapi->freeMap(flipRet);
+
    vi = vsapi->getVideoInfo(node);
 
-   return fail;
-
-done:
-   vsscript_freeScript(se);
-   se = NULL;
    return fail;
 }
 
